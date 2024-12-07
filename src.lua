@@ -1149,52 +1149,34 @@ do
         end
         --
         function window:Unload()
-            for i,v in pairs(library.connections) do
-                v:Disconnect()
-                v = nil
+            for i, v in pairs(library.connections) do
+                if typeof(v) == "RBXScriptConnection" and v.Connected then
+                    v:Disconnect()
+                end
             end
-            --
-            for i,v in next, library.hidden do
-                coroutine.wrap(function()
-                    if v[1] and v[1].Remove and v[1].__OBJECT_EXISTS then
-                        local instance = v[1]
-                        v[1] = nil
-                        v = nil
-                        --
-                        instance:Remove()
-                    end
-                end)()
+        
+            for i, v in pairs(library.hidden) do
+                if v[1] and v[1].Remove and v[1].__OBJECT_EXISTS then
+                    local instance = v[1]
+                    instance:Remove()
+                    v[1] = nil
+                end
             end
-            --
-            for i,v in pairs(library.drawings) do
-                coroutine.wrap(function()
-                    if v[1].__OBJECT_EXISTS then
-                        local instance = v[1]
-                        v[2] = nil
-                        v[1] = nil
-                        v = nil
-                        --
-                        instance:Remove()
-                    end
-                end)()
+        
+            for i, v in pairs(library.drawings) do
+                if v[1] and v[1].__OBJECT_EXISTS then
+                    local instance = v[1]
+                    instance:Remove()
+                    v[1] = nil
+                end
             end
-            --
-            for i,v in pairs(library.objects) do
-                i:Remove()
+        
+            for i, v in pairs(library.objects) do
+                if v.Remove then
+                    v:Remove()
+                end
             end
-            --
-            for i,v in pairs(library.began) do
-                v = nil
-            end
-            --
-            for i,v in pairs(library.ended) do
-                v = nil
-            end
-            --
-            for i,v in pairs(library.changed) do
-                v = nil
-            end
-            --
+        
             library.drawings = {}
             library.objects = {}
             library.hidden = {}
@@ -1202,9 +1184,9 @@ do
             library.began = {}
             library.ended = {}
             library.changed = {}
-            --
+        
             uis.MouseIconEnabled = true
-        end
+        end        
         --
         function window:Watermark(info)
             window.watermark = {visible = false}
